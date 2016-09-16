@@ -1,8 +1,10 @@
 package com.oficinajasperweb.controller;
 
 import com.oficinajasperweb.dao.ClienteDao;
+import com.oficinajasperweb.dao.ConnectionManager;
 import com.oficinajasperweb.model.Cliente;
-import java.util.ArrayList;
+import java.io.File;
+import java.util.HashMap;
 import java.util.List;
 import javax.ws.rs.Consumes;
 import javax.ws.rs.DELETE;
@@ -14,6 +16,9 @@ import javax.ws.rs.PathParam;
 import javax.ws.rs.Produces;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
+import javax.ws.rs.core.Response.ResponseBuilder;
+import net.sf.jasperreports.engine.JRException;
+import net.sf.jasperreports.engine.JasperRunManager;
 
 /**
  *
@@ -29,7 +34,7 @@ public class ClienteController {
 
         ClienteDao clienteDao = new ClienteDao();
         return clienteDao.getAll();
-        
+
     }
 
     @GET
@@ -43,22 +48,34 @@ public class ClienteController {
     }
 
     @GET
-    @Produces(MediaType.TEXT_PLAIN)
+    @Produces({"application/pdf"})
     @Path("print/{id}/")
-    public String getImpressaoCliente(@PathParam("id") Integer id) {
-        System.out.println("getImpressaoCliente");
+    public Response getImpressaoCliente(@PathParam("id") Integer id) throws JRException {
+
+        System.out.println("impressão");
         ClienteDao clienteDao = new ClienteDao();
-        return "" + clienteDao.getById(id).hashCode() + ".pdf";
+        HashMap<String, Object> resultado = new HashMap<String, Object>();
+        resultado.put("IDCLIENTE", clienteDao.getById(id).getId());
+
+        String origem = "Lista de Clientes.jasper";
+        String destino = clienteDao.getById(id).hashCode() + ".pdf";
+        
+        JasperRunManager.runReportToPdfFile("/jasper/" + origem, "/jasper/" + destino, resultado, ConnectionManager.getConnection());
+        File file = new File("c:/jasper/" + destino);
+
+        ResponseBuilder responseBuilder = Response.ok((Object) file);
+        responseBuilder.header("Content-Disposition", "attachment; filename=\"" + destino + "\"");
+        return responseBuilder.build();
     }
 
     @POST
     @Consumes(MediaType.APPLICATION_JSON)
     @Path("/")
     public Response createCliente(Cliente cliente) {
-        
+
         ClienteDao clienteDao = new ClienteDao();
         clienteDao.save(cliente);
-        
+
         return Response.status(Response.Status.OK).build();
     }
 
@@ -66,7 +83,7 @@ public class ClienteController {
     @Consumes(MediaType.APPLICATION_JSON)
     @Path("/")
     public Response updateCliente(Cliente cliente) {
-        
+
         ClienteDao clienteDao = new ClienteDao();
         clienteDao.save(cliente);
 
@@ -80,7 +97,7 @@ public class ClienteController {
 
         ClienteDao clienteDao = new ClienteDao();
         clienteDao.delete(clienteDao.getById(id));
-        
+
         return Response.status(Response.Status.OK).build();
     }
 

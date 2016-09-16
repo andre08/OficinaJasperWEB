@@ -23,7 +23,7 @@ angular.module("ListaClientes").controller("ListaClientesCtrl", function ($scope
             }, function erroCallBack(response) {
                 alert('Erro ao salvar a cliente!');
             });
-            
+
         } else {
 
             $http({
@@ -64,15 +64,7 @@ angular.module("ListaClientes").controller("ListaClientesCtrl", function ($scope
     };
 
     $scope.imprimirCliente = function (cliente) {
-            alert('http://localhost:8080/OficinaJasperWeb/rest/cliente/print/' + cliente.id);
-        $http({
-            method: 'GET',
-            url: "http://localhost:8080/OficinaJasperWeb/rest/cliente/print/" + cliente.id
-        }).then(function successCallBack(response) {
-            window.open(response.toString());
-        }, function erroCallBack(response) {
-            alert('Erro ao imprimir o cliente!');
-        });
+        window.open('http://localhost:8080/OficinaJasperWeb/rest/cliente/print/' + cliente.id);
     };
 
     carregarClientes();
