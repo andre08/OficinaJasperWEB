@@ -67,5 +67,9 @@ angular.module("ListaClientes").controller("ListaClientesCtrl", function ($scope
         window.open('http://localhost:8080/OficinaJasperWeb/rest/cliente/print/' + cliente.id);
     };
 
+    $scope.imprimirTodosCliente = function (cliente) {
+        window.open('http://localhost:8080/OficinaJasperWeb/rest/cliente/print');
+    };
+
     carregarClientes();
 });

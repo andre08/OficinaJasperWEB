@@ -59,7 +59,7 @@ public class ClienteController {
 
         String origem = "Lista de Clientes.jasper";
         String destino = clienteDao.getById(id).hashCode() + ".pdf";
-        
+
         JasperRunManager.runReportToPdfFile("/jasper/" + origem, "/jasper/" + destino, resultado, ConnectionManager.getConnection());
         File file = new File("c:/jasper/" + destino);
 
@@ -99,6 +99,26 @@ public class ClienteController {
         clienteDao.delete(clienteDao.getById(id));
 
         return Response.status(Response.Status.OK).build();
+    }
+
+    @GET
+    @Produces({"application/pdf"})
+    @Path("print/")
+    public Response getImpressaoListaCliente() throws JRException {
+
+        System.out.println("impressão");
+        HashMap<String, Object> resultado = new HashMap<String, Object>();
+
+        String origem = "Lista de Clientes.jasper";
+        String destino = "listacliente.pdf";
+
+        JasperRunManager.runReportToPdfFile("/jasper/" + origem, "/jasper/" + destino, null, ConnectionManager.getConnection());
+        File file = new File("c:/jasper/" + destino);
+
+        ResponseBuilder responseBuilder = Response.ok((Object) file);
+        responseBuilder.header("Content-Disposition", "attachment; filename=\"" + destino + "\"");
+        
+        return responseBuilder.build();
     }
 
 }
